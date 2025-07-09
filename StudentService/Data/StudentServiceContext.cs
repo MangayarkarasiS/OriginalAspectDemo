@@ -15,5 +15,7 @@ namespace StudentService.Data
         }
 
         public DbSet<Stud> Stud { get; set; } = default!;
+        public DbSet<UserCredentials> UserCredentials { get; set; } = default!;
+      
     }
 }

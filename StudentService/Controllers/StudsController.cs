@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -9,6 +6,10 @@ using Microsoft.EntityFrameworkCore;
 using StudentService.Data;
 using StudentService.Models;
 using StudentService.Services;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace StudentService.Controllers
 {
@@ -25,13 +26,15 @@ namespace StudentService.Controllers
         }
 
         // GET: api/Studs
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public IActionResult GetStud()
         {
             return  Ok(_service.GetAllStudents());
         }
-       
+
         // GET: api/Studs/5
+        [Authorize(Roles = "User")]
         [HttpGet("{id}")]
           
         public IActionResult GetStud(int id)
@@ -61,8 +64,8 @@ namespace StudentService.Controllers
         {
          return Ok(_service.DeleteStud(id));   
         }
+        
 
-      
     }
 }
 
