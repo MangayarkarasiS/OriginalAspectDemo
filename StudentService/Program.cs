@@ -22,11 +22,11 @@ namespace StudentService
             
             builder.Services.AddCors(options =>
             {
-                options.AddPolicy("MyCorsPolicy", builder => builder
-                    .WithOrigins("http://localhost:4200")
-                    .AllowAnyMethod()
-                    .AllowCredentials()
-                    .WithHeaders("Accept", "Content-Type", "Origin", "X-My-Header"));
+            options.AddPolicy("MyCorsPolicy", builder => builder
+                .WithOrigins("http://localhost:4200")
+                .AllowAnyMethod()
+                .AllowCredentials()
+                .AllowAnyHeader());// WithHeaders("Accept", "Content-Type", "Origin", "X-My-Header"));
             });
 
             // Add services to the container.

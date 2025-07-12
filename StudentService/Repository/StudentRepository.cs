@@ -17,7 +17,7 @@ namespace StudentService.Repository
             _context.Stud.Add(stud);
             return  _context.SaveChanges();
         }
-
+     
         public int DeleteStud(int id)
         {
             Stud c = _context.Stud.Where(x => x.studId == id).FirstOrDefault();

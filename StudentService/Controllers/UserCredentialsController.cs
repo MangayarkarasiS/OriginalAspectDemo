@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using StudentService.AuthFolder;
@@ -36,6 +37,7 @@ namespace StudentService.Controllers
         // GET: api/UserCredentials/5
        
         [HttpGet("{id}")]
+        [Authorize(Roles ="User")]
         public async Task<ActionResult<UserCredentials>> GetUserCredentials(string id)
         {
             var userCredentials = await _context.UserCredentials.FindAsync(id);
@@ -53,14 +55,22 @@ namespace StudentService.Controllers
         [HttpPost("authentication")]
         public IActionResult Authentication([FromBody] UserCredentials userCredential)
         {
-            var token = jwtAuth.Authentication(userCredential);
-            if (token == null)
+            var userInDb = _context.UserCredentials.FirstOrDefault(u => u.UserName == userCredential.UserName);
+            if (userInDb == null)
                 return Unauthorized();
-            return Ok(token);
+
+            var result = _passwordHasher.VerifyHashedPassword(userInDb, userInDb.Password, userCredential.Password);
+            if (result != PasswordVerificationResult.Success)
+                return Unauthorized();
+            var generatedJwtToken = jwtAuth.Authentication(userCredential);
+            if (generatedJwtToken == null)
+                return Unauthorized();
+            return Ok(new { token = generatedJwtToken });
         }
         // PUT: api/UserCredentials/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        [Authorize(Roles ="Admin")]
         public async Task<IActionResult> PutUserCredentials(string id, UserCredentials userCredentials)
         {
             if (id != userCredentials.UserName)
@@ -88,12 +98,15 @@ namespace StudentService.Controllers
 
             return NoContent();
         }
-
+        private readonly PasswordHasher<UserCredentials> _passwordHasher = new();
         // POST: api/UserCredentials
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [AllowAnonymous]
         public async Task<ActionResult<UserCredentials>> PostUserCredentials(UserCredentials userCredentials)
         {
+           
+            userCredentials.Password = _passwordHasher.HashPassword(userCredentials, userCredentials.Password);
             _context.UserCredentials.Add(userCredentials);
             try
             {
@@ -116,6 +129,7 @@ namespace StudentService.Controllers
 
         // DELETE: api/UserCredentials/5
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteUserCredentials(string id)
         {
             var userCredentials = await _context.UserCredentials.FindAsync(id);
@@ -129,7 +143,7 @@ namespace StudentService.Controllers
 
             return NoContent();
         }
-
+        [Authorize()]
         private bool UserCredentialsExists(string id)
         {
             return _context.UserCredentials.Any(e => e.UserName == id);

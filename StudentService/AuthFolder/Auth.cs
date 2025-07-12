@@ -1,5 +1,6 @@
 ﻿//using JWT.Controllers;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using StudentService.AuthFolder;
@@ -22,21 +23,25 @@ namespace StudentService.AuthFolder
             _userCredentials = userCredentials;
             this.key = "This_is_my_first_Test_Key_for_jwt_token";
          }
-        public Auth(StudentServiceContext userCredentials)
-        {
-            _userCredentials = userCredentials;
-           // this.key = "This_is_my_first_Test_Key_for_jwt_token";
-        }
+       
         public string Authentication(UserCredentials user)
         {
+            var userInDb = _userCredentials.UserCredentials.FirstOrDefault(u => u.UserName == user.UserName);
+            if (userInDb == null)
+                return null;
+
+            var passwordHasher = new PasswordHasher<UserCredentials>();
+            var result = passwordHasher.VerifyHashedPassword(userInDb, userInDb.Password, user.Password);
+            if (result != PasswordVerificationResult.Success)
+                return null;
             //  Use Any() to check if there are matching records instead of directly assigning IQueryable to a bool
-            bool uExists = _userCredentials.UserCredentials.Any(u => u.UserName == user.UserName);
+           /* bool uExists = _userCredentials.UserCredentials.Any(u => u.UserName == user.UserName);
             bool pExists = _userCredentials.UserCredentials.Any(u => u.Password == user.Password);
 
             if (!uExists || !pExists) // Corrected the condition logic
             {
                 return null;
-            }
+            }*/
 
             // 1. Create Security Token Handler
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -64,7 +69,9 @@ namespace StudentService.AuthFolder
             var token = tokenHandler.CreateToken(tokenDescriptor);
 
             // 5. Return Token from method
-            return tokenHandler.WriteToken(token);
+            string generatedJwtToken = tokenHandler.WriteToken(token); // ✅ Declare and assign here
+
+            return generatedJwtToken;
         }
      }
     }

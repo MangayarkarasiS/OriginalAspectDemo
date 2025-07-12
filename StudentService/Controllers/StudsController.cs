@@ -26,15 +26,17 @@ namespace StudentService.Controllers
         }
 
         // GET: api/Studs
-        [Authorize(Roles = "Admin")]
+      
         [HttpGet]
+        [Authorize(Roles = "User")]
         public IActionResult GetStud()
         {
             return  Ok(_service.GetAllStudents());
         }
+     
 
         // GET: api/Studs/5
-        [Authorize(Roles = "User")]
+          [Authorize(Roles = "User")]
         [HttpGet("{id}")]
           
         public IActionResult GetStud(int id)

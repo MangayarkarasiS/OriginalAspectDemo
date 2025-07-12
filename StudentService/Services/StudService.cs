@@ -1,4 +1,5 @@
-﻿using StudentService.Exceptions;
+﻿using Microsoft.EntityFrameworkCore;
+using StudentService.Exceptions;
 using StudentService.Models;
 using StudentService.Repository;
 
@@ -29,6 +30,7 @@ namespace StudentService.Services
             }
             return repo.DeleteStud(id);
         }
+     
 
         public List<Stud> GetAllStudents()
         {
