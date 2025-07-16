@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using StudentService.Data;
+using StudentService.Migrations;
 using StudentService.Models;
 using StudentService.Services;
 using System;
@@ -39,7 +40,7 @@ namespace StudentService.Controllers
           [Authorize(Roles = "User")]
         [HttpGet("{id}")]
           
-        public IActionResult GetStud(int id)
+        public ActionResult GetStud(int id)
         {
             return Ok(_service.GetStudentById(id));
         }

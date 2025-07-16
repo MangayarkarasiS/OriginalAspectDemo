@@ -37,8 +37,7 @@ namespace StudentService.Repository
 
         public int UpdateStud(int id, Stud stud)
         {
-           // _context.Entry(stud).State = EntityState.Modified;           
-           //  return _context.SaveChanges();
+       
             var existingStud = _context.Stud.Find(id); // Retrieve the tracked entity
             if (existingStud == null)
             {
